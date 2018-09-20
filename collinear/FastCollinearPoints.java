@@ -33,9 +33,9 @@ public class FastCollinearPoints {
         for (int i = 0; i < length; i++) {
             Point[] pointSegments = new Point[3 * length];
             pointSegments[0] = points[i];
-            Arrays.sort(pointsClone, pointSegments[0].slopeOrder());
             if (isDuplicate(pointSegments[0], pointsCloneForBinarySearch))
                 throw new IllegalArgumentException();
+            Arrays.sort(pointsClone, pointSegments[0].slopeOrder());
             int pointSegCount = 1;
             boolean lineSegment = false;
             for (int j = 0; j + 1 < length; j++) {
