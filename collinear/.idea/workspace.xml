@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c1e4f978-b3bd-4ae1-84e9-9e1170bce808" name="Default" comment="Correction of double comparison">
+    <list default="true" id="c1e4f978-b3bd-4ae1-84e9-9e1170bce808" name="Default" comment="Use better method to compare doubles and some performance improvements">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FastCollinearPoints.java" beforeDir="false" afterPath="$PROJECT_DIR$/FastCollinearPoints.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -40,14 +41,14 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="8419" />
-          <entry key="txt" value="757" />
+          <entry key="java" value="9076" />
+          <entry key="txt" value="861" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="8419" />
-          <entry key="PLAIN_TEXT" value="757" />
+          <entry key="JAVA" value="9076" />
+          <entry key="PLAIN_TEXT" value="861" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -68,20 +69,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/BruteCollinearPoints.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="37" column="50" selection-start-line="37" selection-start-column="50" selection-end-line="37" selection-end-column="50" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/FastCollinearPoints.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="97">
-              <caret line="87" column="54" lean-forward="true" selection-start-line="87" selection-start-column="54" selection-end-line="87" selection-end-column="54" />
+            <state relative-caret-position="150">
+              <caret line="35" column="75" selection-start-line="35" selection-start-column="75" selection-end-line="35" selection-end-column="75" />
             </state>
           </provider>
         </entry>
@@ -89,7 +81,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Point.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-397">
+            <state relative-caret-position="837">
               <caret line="97" column="34" selection-start-line="97" selection-start-column="34" selection-end-line="97" selection-end-column="34" />
             </state>
           </provider>
@@ -166,6 +158,7 @@
       <find>(25000, 8000)</find>
       <find>4160 29184</find>
       <find>Arrays.sort</find>
+      <find>compareTo</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -274,8 +267,8 @@
       <window_info id="Favorites" order="3" show_stripe_button="false" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4714495" visible="true" weight="0.25592417" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.5980966" weight="0.36176935" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4714495" weight="0.2969984" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.5980966" visible="true" weight="0.36176935" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" show_stripe_button="false" weight="0.32904148" />
@@ -308,7 +301,8 @@
     <MESSAGE value="Resize Line Segment array upon exceeding size" />
     <MESSAGE value="Made some linear searches binary" />
     <MESSAGE value="Correction of double comparison" />
-    <option name="LAST_COMMIT_MESSAGE" value="Correction of double comparison" />
+    <MESSAGE value="Use better method to compare doubles and some performance improvements" />
+    <option name="LAST_COMMIT_MESSAGE" value="Use better method to compare doubles and some performance improvements" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -383,6 +377,16 @@
     </expressions>
     <expressions id="evaluateExpression">
       <expression>
+        <expression-string>pointSegments[0].slopeTo(pointsClone[j + 1])</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>pointSegments[0].slopeTo(pointsClone[j])</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
         <expression-string>pointSegments[0].slopeTo(pointsClone[j]) == pointSegments[0]
                             .slopeTo(pointsClone[j + d])</expression-string>
         <language-id>JAVA</language-id>
@@ -393,11 +397,6 @@
                         .slopeTo(pointsClone[j + 1])
                         &amp;&amp; pointSegments[0].slopeTo(pointsClone[j]) == pointSegments[0]
                         .slopeTo(pointsClone[j + 2])</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>pointSegments[0].slopeTo(pointsClone[j])</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -492,13 +491,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/BruteCollinearPoints.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="37" column="50" selection-start-line="37" selection-start-column="50" selection-end-line="37" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/random91.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1565" />
@@ -510,17 +502,24 @@
     <entry file="file://$PROJECT_DIR$/random152.txt">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/BruteCollinearPoints.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="43" column="89" lean-forward="true" selection-start-line="43" selection-start-column="89" selection-end-line="43" selection-end-column="89" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Point.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-397">
+        <state relative-caret-position="837">
           <caret line="97" column="34" selection-start-line="97" selection-start-column="34" selection-end-line="97" selection-end-column="34" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/FastCollinearPoints.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="97">
-          <caret line="87" column="54" lean-forward="true" selection-start-line="87" selection-start-column="54" selection-end-line="87" selection-end-column="54" />
+        <state relative-caret-position="150">
+          <caret line="35" column="75" selection-start-line="35" selection-start-column="75" selection-end-line="35" selection-end-column="75" />
         </state>
       </provider>
     </entry>
