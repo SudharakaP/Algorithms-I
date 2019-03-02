@@ -33,13 +33,13 @@ public class Percolation {
             throw new IllegalArgumentException();
         }
         if (!isOpen(row, col)) {
-            if (col != 1)
+            if (col != 1 && isOpen(row, col - 1))
                 weightedQuickUnionUF.union(size * (row - 1) + col, size * (row - 1) + col - 1);
-            if (col != size)
+            if (col != size && isOpen(row, col + 1))
                 weightedQuickUnionUF.union(size * (row - 1) + col, size * (row - 1) + col + 1);
-            if (row != 1)
+            if (row != 1 && isOpen(row - 1, col))
                 weightedQuickUnionUF.union(size * (row - 2) + col, size * (row - 1) + col);
-            if (row != size)
+            if (row != size && isOpen(row + 1, col))
                 weightedQuickUnionUF.union(size * row + col, size * (row - 1) + col);
             openClose[row - 1][col - 1] = true;
             numberOfOpenSites++;
@@ -67,9 +67,5 @@ public class Percolation {
 
     public boolean percolates() {
         return weightedQuickUnionUF.connected(0, size * size + 1);
-    }
-
-    public static void main(String[] args) {
-
     }
 }
