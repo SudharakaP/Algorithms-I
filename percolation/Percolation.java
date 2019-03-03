@@ -11,6 +11,7 @@ public class Percolation {
     private final int size;
     private int numberOfOpenSites;
     private boolean[][] openClose;
+    private boolean percolates;
 
     public Percolation(int n) {
         if (n <= 0) {
@@ -18,11 +19,9 @@ public class Percolation {
         }
         size = n;
         openClose = new boolean[n][n];
-        weightedQuickUnionUF = new WeightedQuickUnionUF(n * n + 2);
+        weightedQuickUnionUF = new WeightedQuickUnionUF(n * n + 1);
         for (int i = 1; i <= n; i++)
             weightedQuickUnionUF.union(0, i);
-        for (int i = n * n - n + 1; i <= n * n; i++)
-            weightedQuickUnionUF.union(i, n * n + 1);
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
                 openClose[i][j] = false;
@@ -43,6 +42,8 @@ public class Percolation {
             if (row != size && isOpen(row + 1, col))
                 weightedQuickUnionUF.union(twoToOneDimensionArray(row + 1, col),
                                            twoToOneDimensionArray(row, col));
+            if (row == size && weightedQuickUnionUF.connected(0, twoToOneDimensionArray(row, col)))
+                percolates = true;
             openClose[row - 1][col - 1] = true;
             numberOfOpenSites++;
         }
@@ -57,7 +58,7 @@ public class Percolation {
         boundCheck(row, col);
         if (!isOpen(row, col))
             return false;
-        return weightedQuickUnionUF.connected(0, size * (row - 1) + col);
+        return weightedQuickUnionUF.connected(0, twoToOneDimensionArray(row, col));
     }
 
     public int numberOfOpenSites() {
@@ -65,7 +66,7 @@ public class Percolation {
     }
 
     public boolean percolates() {
-        return weightedQuickUnionUF.connected(0, size * size + 1);
+        return percolates;
     }
 
     private void boundCheck(int row, int col) {
