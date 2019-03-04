@@ -11,7 +11,6 @@ import java.util.NoSuchElementException;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
     private Item[] queue;
-    private int finalElementIndex;
     private int size;
 
     public RandomizedQueue() {
@@ -31,9 +30,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             throw new IllegalArgumentException();
         if (queue.length == size)
             resizeQueue();
-        queue[finalElementIndex] = item;
-        finalElementIndex++;
         size++;
+        queue[size - 1] = item;
+
     }
 
     public Item dequeue() {
@@ -41,10 +40,11 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             throw new NoSuchElementException();
         int random = StdRandom.uniform(size);
         Item randomDequeElement = queue[random];
-        queue[random] = queue[finalElementIndex];
-        queue[finalElementIndex] = null;
-        finalElementIndex--;
+        queue[random] = queue[size - 1];
+        queue[size - 1] = null;
         size--;
+        if (size < queue.length / 4 && size != 0)
+            resizeQueue();
         return randomDequeElement;
     }
 
@@ -63,32 +63,37 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         Item[] resizedQueue = (Item[]) new Object[2 * size];
         int i = 0;
         for (Item item : queue) {
-            resizedQueue[i] = item;
-            i++;
+            if (i < resizedQueue.length) {
+                resizedQueue[i] = item;
+                i++;
+            }
         }
         queue = resizedQueue;
     }
 
     private class RandomizedQueueIterator implements Iterator<Item> {
-        Item[] itemRandomizedArray = (Item[]) new Object[size];
+        Item[] itemRandomizedArray = queue.clone();
         int iterator = 0;
 
         public RandomizedQueueIterator() {
             for (int i = 0; i < size; i++) {
                 int random = StdRandom.uniform(i + 1);
-                itemRandomizedArray[random] = queue[i];
-                itemRandomizedArray[i] = queue[random];
+                Item swap = itemRandomizedArray[i];
+                itemRandomizedArray[i] = itemRandomizedArray[random];
+                itemRandomizedArray[random] = swap;
             }
         }
 
         @Override
         public boolean hasNext() {
-            return !isEmpty();
+            if (iterator == itemRandomizedArray.length)
+                return false;
+            return itemRandomizedArray[iterator] != null;
         }
 
         @Override
         public Item next() {
-            if (isEmpty())
+            if (isEmpty() || iterator == itemRandomizedArray.length)
                 throw new NoSuchElementException();
             return itemRandomizedArray[iterator++];
         }
@@ -99,8 +104,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
     }
 
-    public static void main(String[] args)   // unit testing (optional)
-    {
+    public static void main(String[] args) {
 
     }
 }

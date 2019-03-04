@@ -13,6 +13,7 @@ public class Deque<Item> implements Iterable<Item> {
     private int size;
 
     public Deque() {
+
     }
 
     public boolean isEmpty() {
@@ -29,7 +30,10 @@ public class Deque<Item> implements Iterable<Item> {
         }
 
         Node<Item> node = new Node<>(item, firstElement, null);
-        firstElement.prevElement = node;
+        if (firstElement != null)
+            firstElement.prevElement = node;
+        else
+            lastElement = node;
         firstElement = node;
         size++;
     }
@@ -40,7 +44,10 @@ public class Deque<Item> implements Iterable<Item> {
         }
 
         Node<Item> node = new Node<>(item, null, lastElement);
-        lastElement.nextElement = node;
+        if (lastElement != null)
+            lastElement.nextElement = node;
+        else
+            firstElement = node;
         lastElement = node;
         size++;
     }
@@ -52,6 +59,10 @@ public class Deque<Item> implements Iterable<Item> {
 
         Node<Item> originalFirstElement = firstElement;
         firstElement = firstElement.nextElement;
+        if (firstElement == null)
+            lastElement = null;
+        else
+            firstElement.prevElement = null;
         originalFirstElement.nextElement = null;
         size--;
         return originalFirstElement.item;
@@ -64,6 +75,10 @@ public class Deque<Item> implements Iterable<Item> {
 
         Node<Item> originalLastElement = lastElement;
         lastElement = lastElement.prevElement;
+        if (lastElement == null)
+            firstElement = null;
+        else
+            lastElement.nextElement = null;
         originalLastElement.prevElement = null;
         size--;
         return originalLastElement.item;
@@ -73,12 +88,12 @@ public class Deque<Item> implements Iterable<Item> {
         return new DequeIterator();
     }
 
-    private class Node<Item> {
-        Item item;
-        Node nextElement;
-        Node prevElement;
+    private class Node<NodeItem> {
+        NodeItem item;
+        Node<NodeItem> nextElement;
+        Node<NodeItem> prevElement;
 
-        public Node(Item item, Node nextElement, Node prevElement) {
+        public Node(NodeItem item, Node<NodeItem> nextElement, Node<NodeItem> prevElement) {
             this.item = item;
             this.nextElement = nextElement;
             this.prevElement = prevElement;
@@ -90,7 +105,7 @@ public class Deque<Item> implements Iterable<Item> {
 
         @Override
         public boolean hasNext() {
-            return currentElement.nextElement != null;
+            return currentElement != null;
         }
 
         @Override
@@ -98,8 +113,9 @@ public class Deque<Item> implements Iterable<Item> {
             if (currentElement == null) {
                 throw new NoSuchElementException();
             }
+            Node<Item> originalCurrentElement = currentElement;
             currentElement = currentElement.nextElement;
-            return currentElement.item;
+            return originalCurrentElement.item;
         }
 
         @Override
@@ -110,5 +126,5 @@ public class Deque<Item> implements Iterable<Item> {
 
     public static void main(String[] args) {
 
-    }   // unit testing (optional)
+    }
 }
