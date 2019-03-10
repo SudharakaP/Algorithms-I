@@ -13,7 +13,7 @@ import java.util.Arrays;
 
 public class FastCollinearPoints {
     private int numberOfSegments;
-    private LineSegment[] lineSegments;
+    private final LineSegment[] lineSegments;
 
     public FastCollinearPoints(Point[] points) {
         if (points == null)
@@ -31,8 +31,7 @@ public class FastCollinearPoints {
             }
         }
 
-        LineSegment[] segments = new LineSegment[length * (length - 1) * (length - 2) * (length - 3)
-                / 24];
+        LineSegment[] segments = new LineSegment[length];
 
         Point[] pointsClone = points.clone();
         boolean[] accessedElements = new boolean[length];
