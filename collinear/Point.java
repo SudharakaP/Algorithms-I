@@ -111,7 +111,7 @@ public class Point implements Comparable<Point> {
     }
 
     private class SlopeOrderComparator implements Comparator<Point> {
-        private Point point;
+        private final Point point;
 
         public SlopeOrderComparator(Point point) {
             this.point = point;

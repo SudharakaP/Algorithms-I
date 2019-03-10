@@ -13,7 +13,7 @@ import java.util.Arrays;
 
 public class BruteCollinearPoints {
     private int numberOfSegments;
-    private LineSegment[] lineSegments;
+    private final LineSegment[] lineSegments;
 
     public BruteCollinearPoints(Point[] points) {
 
@@ -32,8 +32,7 @@ public class BruteCollinearPoints {
             }
         }
 
-        LineSegment[] segments = new LineSegment[length * (length - 1) * (length - 2) * (length - 3)
-                / 24];
+        LineSegment[] segments = new LineSegment[length];
 
         for (int i = 0; i < length; i++) {
             for (int j = i + 1; j < length; j++) {
