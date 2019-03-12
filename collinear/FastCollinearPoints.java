@@ -67,20 +67,20 @@ public class FastCollinearPoints {
                             nonNullSegments[n] = point;
                             n++;
                         }
-                    Arrays.sort(nonNullSegments);
+                    Point[] smallestLargest = smallestAndLargest(nonNullSegments);
 
                     int lineSegIndStart = binarySearchElement(pointsCloneForBinarySearch,
-                                                              nonNullSegments[0], 0,
+                                                              smallestLargest[0], 0,
                                                               length - 1);
                     int lineSegIndEnd = binarySearchElement(pointsCloneForBinarySearch,
-                                                            nonNullSegments[k - 1], 0,
+                                                            smallestLargest[1], 0,
                                                             length - 1);
 
                     if (!lineSegmentDuplicate[lineSegIndStart][lineSegIndEnd]) {
                         if (segments.length <= numberOfSegments)
                             segments = resizeArray(segments);
-                        segments[numberOfSegments++] = new LineSegment(nonNullSegments[0],
-                                                                       nonNullSegments[k - 1]);
+                        segments[numberOfSegments++] = new LineSegment(smallestLargest[0],
+                                                                       smallestLargest[1]);
                         lineSegmentDuplicate[lineSegIndStart][lineSegIndEnd] = true;
                         lineSegmentDuplicate[lineSegIndEnd][lineSegIndStart] = true;
                     }
@@ -123,6 +123,20 @@ public class FastCollinearPoints {
             newLineSegments[i] = segmentArray[i];
         }
         return newLineSegments;
+    }
+
+    private Point[] smallestAndLargest(Point[] pointArray) {
+        Point smallestElement = pointArray[0];
+        Point largestElement = pointArray[0];
+
+        for (Point point : pointArray) {
+            if (point.compareTo(smallestElement) < 0)
+                smallestElement = point;
+            if (point.compareTo(largestElement) > 0)
+                largestElement = point;
+        }
+        Point[] smallestLargest = { smallestElement, largestElement };
+        return smallestLargest;
     }
 
     public int numberOfSegments() {
