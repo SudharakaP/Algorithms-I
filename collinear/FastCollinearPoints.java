@@ -91,10 +91,10 @@ public class FastCollinearPoints {
 
     private boolean isDuplicate(Point point, Point[] points) {
         int index = binarySearchElement(points, point, 0, points.length - 1);
-        if (binarySearchElement(points, point, 0, index - 1) == -1
-                && binarySearchElement(points, point, index + 1, points.length - 1) == -1)
-            return false;
-        return true;
+        if ((index != 0 && points[index - 1].compareTo(point) == 0) || (
+                (index != points.length - 1) && points[index + 1].compareTo(point) == 0))
+            return true;
+        return false;
     }
 
     private int binarySearchElement(Point[] points, Point element, int firstElementIndex,
