@@ -75,10 +75,12 @@ public class FastCollinearPoints {
                     }
                     for (int s = 0; s < length; s++) {
                         if (points[s].compareTo(nonNullSegments[k - 1]) == 0)
-                            lineSegIndStart = s;
+                            lineSegIndEnd = s;
                     }
 
                     if (!lineSegmentDuplicate[lineSegIndStart][lineSegIndEnd]) {
+                        if (segments.length < numberOfSegments)
+                            segments = resizeArray(segments);
                         segments[numberOfSegments++] = new LineSegment(nonNullSegments[0],
                                                                        nonNullSegments[k - 1]);
                         lineSegmentDuplicate[lineSegIndStart][lineSegIndEnd] = true;
@@ -99,6 +101,15 @@ public class FastCollinearPoints {
             if (lineSegment != null)
                 lineSegments[i++] = lineSegment;
         }
+    }
+
+    private LineSegment[] resizeArray(LineSegment[] lineSegments) {
+        LineSegment[] newLineSegments = new LineSegment[2 * lineSegments.length];
+
+        for (int i = 0; i < lineSegments.length; i++) {
+            newLineSegments[i] = lineSegments[i];
+        }
+        return newLineSegments;
     }
 
     public int numberOfSegments() {
