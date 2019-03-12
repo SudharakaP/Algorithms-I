@@ -36,9 +36,9 @@ public class FastCollinearPoints {
         Point[] pointsClone = points.clone();
         boolean[][] lineSegmentDuplicate = new boolean[length][length];
         for (int i = 0; i < length; i++) {
-            Point[] pointSegments = new Point[length + 1];
-            pointSegments[0] = pointsClone[i];
-            Arrays.sort(pointsClone, pointsClone[i].slopeOrder());
+            Point[] pointSegments = new Point[3 * length];
+            pointSegments[0] = points[i];
+            Arrays.sort(pointsClone, pointSegments[0].slopeOrder());
             double[] slopes = new double[length];
             for (int x = 0; x < length; x++) {
                 slopes[x] = pointSegments[0].slopeTo(pointsClone[x]);
