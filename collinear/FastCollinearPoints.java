@@ -34,6 +34,7 @@ public class FastCollinearPoints {
         LineSegment[] segments = new LineSegment[length];
 
         Point[] pointsClone = points.clone();
+        Arrays.sort(points);
         boolean[][] lineSegmentDuplicate = new boolean[length][length];
         for (int i = 0; i < length; i++) {
             Point[] pointSegments = new Point[3 * length];
@@ -67,19 +68,13 @@ public class FastCollinearPoints {
                         }
                     Arrays.sort(nonNullSegments);
 
-                    int lineSegIndStart = 0;
-                    int lineSegIndEnd = 0;
-                    for (int s = 0; s < length; s++) {
-                        if (points[s].compareTo(nonNullSegments[0]) == 0)
-                            lineSegIndStart = s;
-                    }
-                    for (int s = 0; s < length; s++) {
-                        if (points[s].compareTo(nonNullSegments[k - 1]) == 0)
-                            lineSegIndEnd = s;
-                    }
+                    int lineSegIndStart = binarySearchElement(points, nonNullSegments[0], 0,
+                                                              length - 1);
+                    int lineSegIndEnd = binarySearchElement(points, nonNullSegments[k - 1], 0,
+                                                            length - 1);
 
                     if (!lineSegmentDuplicate[lineSegIndStart][lineSegIndEnd]) {
-                        if (segments.length < numberOfSegments)
+                        if (segments.length <= numberOfSegments)
                             segments = resizeArray(segments);
                         segments[numberOfSegments++] = new LineSegment(nonNullSegments[0],
                                                                        nonNullSegments[k - 1]);
@@ -101,6 +96,21 @@ public class FastCollinearPoints {
             if (lineSegment != null)
                 lineSegments[i++] = lineSegment;
         }
+    }
+
+    private int binarySearchElement(Point[] points, Point element, int firstElementIndex,
+                                    int lastElementIndex) {
+        int midPoint = (firstElementIndex + lastElementIndex) >>> 1;
+        if (element.compareTo(points[midPoint]) == 0) {
+            return midPoint;
+        }
+        else if (element.compareTo(points[midPoint]) > 0) {
+            firstElementIndex = midPoint + 1;
+        }
+        else if (element.compareTo(points[midPoint]) < 0) {
+            lastElementIndex = midPoint - 1;
+        }
+        return binarySearchElement(points, element, firstElementIndex, lastElementIndex);
     }
 
     private LineSegment[] resizeArray(LineSegment[] lineSegments) {
