@@ -34,25 +34,23 @@ public class FastCollinearPoints {
         LineSegment[] segments = new LineSegment[length];
 
         Point[] pointsClone = points.clone();
-        boolean[] accessedElements = new boolean[length];
+        boolean[][] lineSegmentDuplicate = new boolean[length][length];
         for (int i = 0; i < length; i++) {
-            if (accessedElements[i])
-                continue;
             Point[] pointSegments = new Point[length + 1];
             pointSegments[0] = pointsClone[i];
-            accessedElements[i] = true;
             Arrays.sort(pointsClone, pointsClone[i].slopeOrder());
             int pointSegCount = 1;
             boolean lineSegment = false;
-            for (int j = 0; j + 1 < length; j++) {
+            for (int j = 0; j + 2 < length; j++) {
                 if (i != j && pointSegments[0].slopeTo(pointsClone[j]) == pointSegments[0]
-                        .slopeTo(pointsClone[j + 1])) {
+                        .slopeTo(pointsClone[j + 1])
+                        && pointSegments[0].slopeTo(pointsClone[j]) == pointSegments[0]
+                        .slopeTo(pointsClone[j + 2])) {
                     lineSegment = true;
                     pointSegments[pointSegCount] = pointsClone[j];
                     pointSegments[pointSegCount + 1] = pointsClone[j + 1];
-                    accessedElements[j] = true;
-                    accessedElements[j + 1] = true;
-                    pointSegCount += 2;
+                    pointSegments[pointSegCount + 2] = pointsClone[j + 2];
+                    pointSegCount += 3;
                 }
                 else if (lineSegment && pointSegCount > 3) {
                     int k = 0;
@@ -67,10 +65,26 @@ public class FastCollinearPoints {
                             n++;
                         }
                     Arrays.sort(nonNullSegments);
-                    segments[numberOfSegments++] = new LineSegment(nonNullSegments[0],
-                                                                   nonNullSegments[k - 1]);
+
+                    int lineSegIndStart = 0;
+                    int lineSegIndEnd = 0;
+                    for (int s = 0; s < length; s++) {
+                        if (points[s].compareTo(nonNullSegments[0]) == 0)
+                            lineSegIndStart = s;
+                    }
+                    for (int s = 0; s < length; s++) {
+                        if (points[s].compareTo(nonNullSegments[k - 1]) == 0)
+                            lineSegIndStart = s;
+                    }
+
+                    if (!lineSegmentDuplicate[lineSegIndStart][lineSegIndEnd]) {
+                        segments[numberOfSegments++] = new LineSegment(nonNullSegments[0],
+                                                                       nonNullSegments[k - 1]);
+                        lineSegmentDuplicate[lineSegIndStart][lineSegIndEnd] = true;
+                        lineSegmentDuplicate[lineSegIndEnd][lineSegIndStart] = true;
+                    }
                     lineSegment = false;
-                    for (int m = 0; m < length; m++){
+                    for (int m = 1; m < length; m++) {
                         pointSegments[m] = null;
                     }
                     pointSegCount = 1;
