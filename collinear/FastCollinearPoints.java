@@ -34,7 +34,8 @@ public class FastCollinearPoints {
         LineSegment[] segments = new LineSegment[length];
 
         Point[] pointsClone = points.clone();
-        Arrays.sort(points);
+        Point[] pointsCloneForBinarySearch = points.clone();
+        Arrays.sort(pointsCloneForBinarySearch);
         boolean[][] lineSegmentDuplicate = new boolean[length][length];
         for (int i = 0; i < length; i++) {
             Point[] pointSegments = new Point[3 * length];
@@ -44,10 +45,10 @@ public class FastCollinearPoints {
             boolean lineSegment = false;
             for (int j = 0; j + 1 < length; j++) {
                 if (j + 2 < length
-                        && pointSegments[0].slopeTo(pointsClone[j]) == pointSegments[0]
-                        .slopeTo(pointsClone[j + 1])
-                        && pointSegments[0].slopeTo(pointsClone[j]) == pointSegments[0]
-                        .slopeTo(pointsClone[j + 2])) {
+                        && Double.compare(pointSegments[0].slopeTo(pointsClone[j]),
+                                          pointSegments[0].slopeTo(pointsClone[j + 1])) == 0
+                        && Double.compare(pointSegments[0].slopeTo(pointsClone[j]),
+                                          pointSegments[0].slopeTo(pointsClone[j + 2])) == 0) {
                     lineSegment = true;
                     pointSegments[pointSegCount] = pointsClone[j];
                     pointSegments[pointSegCount + 1] = pointsClone[j + 1];
@@ -68,9 +69,11 @@ public class FastCollinearPoints {
                         }
                     Arrays.sort(nonNullSegments);
 
-                    int lineSegIndStart = binarySearchElement(points, nonNullSegments[0], 0,
+                    int lineSegIndStart = binarySearchElement(pointsCloneForBinarySearch,
+                                                              nonNullSegments[0], 0,
                                                               length - 1);
-                    int lineSegIndEnd = binarySearchElement(points, nonNullSegments[k - 1], 0,
+                    int lineSegIndEnd = binarySearchElement(pointsCloneForBinarySearch,
+                                                            nonNullSegments[k - 1], 0,
                                                             length - 1);
 
                     if (!lineSegmentDuplicate[lineSegIndStart][lineSegIndEnd]) {
@@ -113,11 +116,11 @@ public class FastCollinearPoints {
         return binarySearchElement(points, element, firstElementIndex, lastElementIndex);
     }
 
-    private LineSegment[] resizeArray(LineSegment[] lineSegments) {
-        LineSegment[] newLineSegments = new LineSegment[2 * lineSegments.length];
+    private LineSegment[] resizeArray(LineSegment[] segmentArray) {
+        LineSegment[] newLineSegments = new LineSegment[2 * segmentArray.length];
 
-        for (int i = 0; i < lineSegments.length; i++) {
-            newLineSegments[i] = lineSegments[i];
+        for (int i = 0; i < segmentArray.length; i++) {
+            newLineSegments[i] = segmentArray[i];
         }
         return newLineSegments;
     }
