@@ -33,9 +33,9 @@ public class FastCollinearPoints {
         for (int i = 0; i < length; i++) {
             Point[] pointSegments = new Point[3 * length];
             pointSegments[0] = points[i];
-            if (binarySearchElement(points, points[0], 1, length - 1) != -1)
-                throw new IllegalArgumentException();
             Arrays.sort(pointsClone, pointSegments[0].slopeOrder());
+            if (isDuplicate(pointSegments[0], pointsCloneForBinarySearch))
+                throw new IllegalArgumentException();
             int pointSegCount = 1;
             boolean lineSegment = false;
             for (int j = 0; j + 1 < length; j++) {
@@ -87,6 +87,14 @@ public class FastCollinearPoints {
             if (lineSegment != null)
                 lineSegments[i++] = lineSegment;
         }
+    }
+
+    private boolean isDuplicate(Point point, Point[] points) {
+        int index = binarySearchElement(points, point, 0, points.length - 1);
+        if (binarySearchElement(points, point, 0, index - 1) == -1
+                && binarySearchElement(points, point, index + 1, points.length - 1) == -1)
+            return false;
+        return true;
     }
 
     private int binarySearchElement(Point[] points, Point element, int firstElementIndex,
