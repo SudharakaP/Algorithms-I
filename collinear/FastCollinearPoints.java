@@ -43,32 +43,39 @@ public class FastCollinearPoints {
             accessedElements[i] = true;
             Arrays.sort(pointsClone, pointsClone[i].slopeOrder());
             int pointSegCount = 1;
+            boolean lineSegment = false;
             for (int j = 0; j + 1 < length; j++) {
                 if (i != j && pointSegments[0].slopeTo(pointsClone[j]) == pointSegments[0]
                         .slopeTo(pointsClone[j + 1])) {
+                    lineSegment = true;
                     pointSegments[pointSegCount] = pointsClone[j];
                     pointSegments[pointSegCount + 1] = pointsClone[j + 1];
                     accessedElements[j] = true;
                     accessedElements[j + 1] = true;
                     pointSegCount += 2;
                 }
-            }
-            if (pointSegCount < 2)
-                continue;
-            int k = 0;
-            for (Point point : pointSegments)
-                if (point != null)
-                    k++;
-            Point[] nonNullSegments = new Point[k];
-            int n = 0;
-            for (Point point : pointSegments)
-                if (point != null) {
-                    nonNullSegments[n] = point;
-                    n++;
+                else if (lineSegment && pointSegCount > 3) {
+                    int k = 0;
+                    for (Point point : pointSegments)
+                        if (point != null)
+                            k++;
+                    Point[] nonNullSegments = new Point[k];
+                    int n = 0;
+                    for (Point point : pointSegments)
+                        if (point != null) {
+                            nonNullSegments[n] = point;
+                            n++;
+                        }
+                    Arrays.sort(nonNullSegments);
+                    segments[numberOfSegments++] = new LineSegment(nonNullSegments[0],
+                                                                   nonNullSegments[k - 1]);
+                    lineSegment = false;
+                    for (int m = 0; m < length; m++){
+                        pointSegments[m] = null;
+                    }
+                    pointSegCount = 1;
                 }
-            Arrays.sort(nonNullSegments);
-            segments[numberOfSegments++] = new LineSegment(nonNullSegments[0],
-                                                           nonNullSegments[k - 1]);
+            }
         }
 
         lineSegments = new LineSegment[numberOfSegments];
