@@ -24,13 +24,6 @@ public class FastCollinearPoints {
         }
 
         int length = points.length;
-        for (int i = 0; i < length; i++) {
-            for (int j = 0; j < length && j != i; j++) {
-                if (points[i].compareTo(points[j]) == 0)
-                    throw new IllegalArgumentException();
-            }
-        }
-
         LineSegment[] segments = new LineSegment[length];
 
         Point[] pointsClone = points.clone();
@@ -40,6 +33,8 @@ public class FastCollinearPoints {
         for (int i = 0; i < length; i++) {
             Point[] pointSegments = new Point[3 * length];
             pointSegments[0] = points[i];
+            if (binarySearchElement(points, points[0], 1, length - 1) != -1)
+                throw new IllegalArgumentException();
             Arrays.sort(pointsClone, pointSegments[0].slopeOrder());
             int pointSegCount = 1;
             boolean lineSegment = false;
@@ -56,17 +51,10 @@ public class FastCollinearPoints {
                     pointSegCount += 3;
                 }
                 else if (lineSegment && pointSegCount > 3) {
-                    int k = 0;
-                    for (Point point : pointSegments)
-                        if (point != null)
-                            k++;
-                    Point[] nonNullSegments = new Point[k];
-                    int n = 0;
-                    for (Point point : pointSegments)
-                        if (point != null) {
-                            nonNullSegments[n] = point;
-                            n++;
-                        }
+                    Point[] nonNullSegments = new Point[pointSegCount];
+                    for (int t = 0; t < pointSegCount; t++)
+                        nonNullSegments[t] = pointSegments[t];
+
                     Point[] smallestLargest = smallestAndLargest(nonNullSegments);
 
                     int lineSegIndStart = binarySearchElement(pointsCloneForBinarySearch,
@@ -104,14 +92,16 @@ public class FastCollinearPoints {
     private int binarySearchElement(Point[] points, Point element, int firstElementIndex,
                                     int lastElementIndex) {
         int midPoint = (firstElementIndex + lastElementIndex) >>> 1;
-        if (element.compareTo(points[midPoint]) == 0) {
-            return midPoint;
-        }
+        if (firstElementIndex > lastElementIndex)
+            return -1;
         else if (element.compareTo(points[midPoint]) > 0) {
             firstElementIndex = midPoint + 1;
         }
         else if (element.compareTo(points[midPoint]) < 0) {
             lastElementIndex = midPoint - 1;
+        }
+        else {
+            return midPoint;
         }
         return binarySearchElement(points, element, firstElementIndex, lastElementIndex);
     }
@@ -132,7 +122,7 @@ public class FastCollinearPoints {
         for (Point point : pointArray) {
             if (point.compareTo(smallestElement) < 0)
                 smallestElement = point;
-            if (point.compareTo(largestElement) > 0)
+            else if (point.compareTo(largestElement) > 0)
                 largestElement = point;
         }
         Point[] smallestLargest = { smallestElement, largestElement };
