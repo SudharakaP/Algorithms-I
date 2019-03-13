@@ -44,10 +44,16 @@ public class FastCollinearPoints {
                         && Double.compare(pointSegments[0].slopeTo(pointsClone[j]),
                                           pointSegments[0].slopeTo(pointsClone[j + 2])) == 0) {
                     lineSegment = true;
-                    pointSegments[pointSegCount] = pointsClone[j];
-                    pointSegments[pointSegCount + 1] = pointsClone[j + 1];
-                    pointSegments[pointSegCount + 2] = pointsClone[j + 2];
-                    pointSegCount += 3;
+                    if (pointSegCount < 3) {
+                        pointSegments[pointSegCount] = pointsClone[j];
+                        pointSegments[pointSegCount + 1] = pointsClone[j + 1];
+                        pointSegments[pointSegCount + 2] = pointsClone[j + 2];
+                        pointSegCount += 3;
+                    }
+                    else {
+                        pointSegments[pointSegCount] = pointsClone[j + 2];
+                        pointSegCount++;
+                    }
                 }
                 else if (lineSegment && pointSegCount > 3) {
                     Point[] nonNullSegments = new Point[pointSegCount];
