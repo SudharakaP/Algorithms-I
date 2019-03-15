@@ -55,9 +55,17 @@ public class Board {
     public Board twin() {
         int[][] twinBlock = blocks.clone();
         int swapEle = twinBlock[0][0];
-        twinBlock[0][0] = twinBlock[0][1];
-        twinBlock[0][1] = swapEle;
-        return new Board(twinBlock);
+        if (swapEle != 0 && twinBlock[0][1] != 0) {
+            twinBlock[0][0] = twinBlock[0][1];
+            twinBlock[0][1] = swapEle;
+            return new Board(twinBlock);
+        }
+        else {
+            swapEle = twinBlock[1][0];
+            twinBlock[1][0] = twinBlock[1][1];
+            twinBlock[1][1] = swapEle;
+            return new Board(twinBlock);
+        }
     }
 
     public boolean equals(Object y) {
