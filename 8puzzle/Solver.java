@@ -33,6 +33,7 @@ public class Solver {
         Board minPriorityBoard;
         Board predecessor = null;
 
+        solution = new Board[initial.manhattan()];
         int index = 0;
         do {
             if (moves > initial.manhattan()) {
