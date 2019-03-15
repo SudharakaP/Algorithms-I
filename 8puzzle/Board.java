@@ -61,7 +61,7 @@ public class Board {
     }
 
     public boolean equals(Object y) {
-        if (y instanceof Board) {
+        if (y.getClass().getName().equals("Board")) {
             Board board = (Board) y;
             for (int row = 0; row < dimension; row++) {
                 for (int col = 0; col < dimension; col++) {
