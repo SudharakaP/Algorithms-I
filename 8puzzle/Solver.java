@@ -15,37 +15,89 @@ public class Solver {
     private boolean isSolvable;
     private final Board[] solution;
 
+    private int movesTwin;
+    private final Board[] solutionTwin;
+
     public Solver(Board initial) {
         if (initial == null)
             throw new IllegalArgumentException();
-        MinPQ<Board> boardQueue = new MinPQ<>(
-                (o1, o2) -> Integer.compare(o1.manhattan(), o2.manhattan()));
-        boardQueue.insert(initial);
-        Board minPriorityBoard;
+        moves = 0;
+        movesTwin = 0;
+        MinPQ<SearchNode> boardQueue = new MinPQ<>(
+                (o1, o2) -> Integer.compare(o1.priority, o2.priority));
+        boardQueue.insert(new SearchNode(initial, moves));
+        MinPQ<SearchNode> boardQueueTwin = new MinPQ<>(
+                (o1, o2) -> Integer.compare(o1.priority, o2.priority));
+        boardQueueTwin.insert(new SearchNode(initial.twin(), moves));
         Board predecessor = null;
+        Board predecessorTwin = null;
 
-        solution = new Board[initial.manhattan() + 1];
+        solution = new Board[1000];
+        solutionTwin = new Board[1000];
         int index = 0;
-        while (true) {
-            if (moves > initial.manhattan()) {
-                moves = -1;
-                break;
+        do {
+            predecessor = computeAStar(boardQueue, predecessor);
+            predecessorTwin = computeAStarTwin(boardQueueTwin, predecessorTwin);
+        } while (!predecessor.isGoal() && !predecessorTwin.isGoal());
+
+        if (!predecessor.isGoal()) {
+            moves = -1;
+        }
+    }
+
+    private Board computeAStar(MinPQ<SearchNode> boardQueue, Board predecessor) {
+        SearchNode minPriorityBoardNode = boardQueue.delMin();
+        while (minPriorityBoardNode.moves != moves)
+            minPriorityBoardNode = boardQueue.delMin();
+        Board minPriorityBoard = minPriorityBoardNode.board;
+        solution[moves] = minPriorityBoard;
+
+        if (minPriorityBoard.isGoal()) {
+            isSolvable = true;
+            return minPriorityBoard;
+        }
+        Iterable<Board> neighbours = minPriorityBoard.neighbors();
+        moves++;
+        for (Board neighbour : neighbours) {
+            if (neighbour != null) {
+                if (predecessor == null || !predecessor.equals(neighbour))
+                    boardQueue.insert(new SearchNode(neighbour, moves));
             }
-            minPriorityBoard = boardQueue.delMin();
-            solution[index++] = minPriorityBoard;
-            if (minPriorityBoard.isGoal()) {
-                isSolvable = true;
-                break;
+        }
+        return minPriorityBoard;
+    }
+
+
+    private Board computeAStarTwin(MinPQ<SearchNode> boardQueue, Board predecessor) {
+        SearchNode minPriorityBoardNode = boardQueue.delMin();
+        while (minPriorityBoardNode.moves != movesTwin)
+            minPriorityBoardNode = boardQueue.delMin();
+        Board minPriorityBoard = minPriorityBoardNode.board;
+        solutionTwin[movesTwin] = minPriorityBoard;
+
+        if (minPriorityBoard.isGoal()) {
+            return minPriorityBoard;
+        }
+        Iterable<Board> neighbours = minPriorityBoard.neighbors();
+        movesTwin++;
+        for (Board neighbour : neighbours) {
+            if (neighbour != null) {
+                if (predecessor == null || !predecessor.equals(neighbour))
+                    boardQueue.insert(new SearchNode(neighbour, movesTwin));
             }
-            Iterable<Board> neighbours = minPriorityBoard.neighbors();
-            for (Board neighbour : neighbours) {
-                if (neighbour != null) {
-                    if (predecessor == null || !predecessor.equals(neighbour))
-                        boardQueue.insert(neighbour);
-                }
-            }
-            predecessor = minPriorityBoard;
-            moves++;
+        }
+        return minPriorityBoard;
+    }
+
+    private class SearchNode {
+        private int priority;
+        private Board board;
+        private int moves;
+
+        public SearchNode(Board board, int moves) {
+            this.board = board;
+            this.moves = moves;
+            this.priority = moves + board.manhattan();
         }
     }
 
@@ -60,7 +112,12 @@ public class Solver {
     public Iterable<Board> solution() {
         if (!isSolvable())
             return null;
-        return Arrays.asList(solution);
+        Board[] nonNullArray = new Board[moves + 1];
+        for (int i = 0; i < moves + 1; i++) {
+            if (solution[i] != null)
+                nonNullArray[i] = solution[i];
+        }
+        return Arrays.asList(nonNullArray);
     }
 
     public static void main(String[] args) {
