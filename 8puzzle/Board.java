@@ -7,11 +7,10 @@
 import java.util.Arrays;
 
 public class Board {
-    private int[][] blocks;
-    private int dimension;
+    private final int[][] blocks;
+    private final int dimension;
     private int hamming;
     private int manhattan;
-    private Board predecessor;
 
     public Board(int[][] blocks) {
         dimension = blocks.length;
@@ -48,11 +47,11 @@ public class Board {
     }
 
     public boolean isGoal() {
-        return hamming == 0;
+        return manhattan == 0;
     }
 
     public Board twin() {
-        int[][] twinBlock = blocks.clone();
+        int[][] twinBlock = deepClone(blocks);
         int swapEle = twinBlock[0][0];
         if (swapEle != 0 && twinBlock[0][1] != 0) {
             twinBlock[0][0] = twinBlock[0][1];
@@ -70,6 +69,8 @@ public class Board {
     public boolean equals(Object y) {
         if (y != null && y.getClass().getName().equals("Board")) {
             Board board = (Board) y;
+            if (board.dimension != this.dimension)
+                return false;
             for (int row = 0; row < dimension; row++) {
                 for (int col = 0; col < dimension; col++) {
                     if (blocks[row][col] != board.blocks[row][col]) {
@@ -86,6 +87,7 @@ public class Board {
 
     public Iterable<Board> neighbors() {
         Board[] boards = new Board[4];
+        int count = 0;
         int zeroRow = 0, zeroCol = 0;
         for (int row = 0; row < dimension; row++) {
             for (int col = 0; col < dimension; col++) {
@@ -100,30 +102,44 @@ public class Board {
             blocks1[zeroRow][zeroCol] = blocks1[zeroRow][zeroCol - 1];
             blocks1[zeroRow][zeroCol - 1] = 0;
             boards[0] = new Board(blocks1);
+            count++;
         }
         if (zeroCol < dimension - 1) {
             int[][] blocks2 = deepClone(blocks);
             blocks2[zeroRow][zeroCol] = blocks2[zeroRow][zeroCol + 1];
             blocks2[zeroRow][zeroCol + 1] = 0;
             boards[1] = new Board(blocks2);
+            count++;
         }
         if (zeroRow > 0) {
             int[][] blocks3 = deepClone(blocks);
             blocks3[zeroRow][zeroCol] = blocks3[zeroRow - 1][zeroCol];
             blocks3[zeroRow - 1][zeroCol] = 0;
             boards[2] = new Board(blocks3);
+            count++;
         }
         if (zeroRow < dimension - 1) {
             int[][] blocks4 = deepClone(blocks);
             blocks4[zeroRow][zeroCol] = blocks4[zeroRow + 1][zeroCol];
             blocks4[zeroRow + 1][zeroCol] = 0;
             boards[3] = new Board(blocks4);
+            count++;
         }
 
-        return Arrays.asList(boards);
+        Board[] boardReturnArray = new Board[count];
+
+        int index = 0;
+        for (Board board : boards) {
+            if (board != null) {
+                boardReturnArray[index] = board;
+                index++;
+            }
+        }
+
+        return Arrays.asList(boardReturnArray);
     }
 
-    public int[][] deepClone(int[][] block) {
+    private int[][] deepClone(int[][] block) {
         int length = block.length;
         int[][] deepCloneBlock = new int[block.length][block.length];
         for (int row = 0; row < length; row++) {
@@ -145,14 +161,6 @@ public class Board {
         }
         output.append("\n ");
         return output.toString();
-    }
-
-    public void setPredecessor(Board board) {
-        this.predecessor = board;
-    }
-
-    public Board getPredecessor() {
-        return predecessor;
     }
 
     public static void main(String[] args) {
