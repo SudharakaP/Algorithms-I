@@ -18,40 +18,36 @@ public class Solver {
     public Solver(Board initial) {
         if (initial == null)
             throw new IllegalArgumentException();
-        MinPQ<Board> boardQueue = new MinPQ<>((o1, o2) -> {
-            if (o1.manhattan() > o2.manhattan()) {
-                return 1;
-            }
-            else if (o1.manhattan() < o2.manhattan()) {
-                return -1;
-            }
-            else {
-                return 0;
-            }
-        });
+        MinPQ<Board> boardQueue = new MinPQ<>(
+                (o1, o2) -> Integer.compare(o1.manhattan(), o2.manhattan()));
         boardQueue.insert(initial);
         Board minPriorityBoard;
         Board predecessor = null;
 
-        solution = new Board[initial.manhattan()];
+        solution = new Board[initial.manhattan() + 1];
         int index = 0;
-        do {
+        while (true) {
             if (moves > initial.manhattan()) {
                 isSolvable = false;
                 moves = -1;
                 break;
             }
             minPriorityBoard = boardQueue.delMin();
-            if (minPriorityBoard.equals(predecessor))
-                minPriorityBoard = boardQueue.delMin();
-            predecessor = minPriorityBoard;
             solution[index++] = minPriorityBoard;
+            if (minPriorityBoard.hamming() == 0)
+                break;
             Iterable<Board> neighbours = minPriorityBoard.neighbors();
             for (Board neighbour : neighbours) {
-                boardQueue.insert(neighbour);
+                if (neighbour != null) {
+                    if (minPriorityBoard.getPredecessor() == null || !minPriorityBoard
+                            .getPredecessor().equals(neighbour)) {
+                        boardQueue.insert(neighbour);
+                        neighbour.setPredecessor(minPriorityBoard);
+                    }
+                }
             }
             moves++;
-        } while (minPriorityBoard.hamming() == 0);
+        }
     }           // find a solution to the initial board (using the A* algorithm)
 
     public boolean isSolvable() {

@@ -9,29 +9,28 @@ import java.util.Arrays;
 public class Board {
     private int[][] blocks;
     private int dimension;
-    private int hamming = -1;
-    private int manhattan = -1;
+    private int hamming;
+    private int manhattan;
+    private Board predecessor;
 
     public Board(int[][] blocks) {
-        this.blocks = blocks.clone();
         dimension = blocks.length;
+        this.blocks = new int[dimension][dimension];
 
-        // Hamming Distance
+        // Hamming Distance and deep clone
         for (int row = 0; row < dimension; row++)
-            for (int col = 0; col < dimension; col++)
-                if (blocks[row][col] != 3 * row + col + 1)
+            for (int col = 0; col < dimension; col++) {
+                this.blocks[row][col] = blocks[row][col];
+                if (blocks[row][col] != 0 && blocks[row][col] != dimension * row + col + 1)
                     hamming++;
-        if (blocks[dimension - 1][dimension - 1] == 0)
-            hamming--;
+            }
 
         // Manhatten Distance
         for (int row = 0; row < dimension; row++)
             for (int col = 0; col < dimension; col++)
-                if (blocks[row][col] == 0)
-                    manhattan += 2 * (dimension - 1) + row + col;
-                else {
-                    int rowGoal = blocks[row][col] / dimension;
-                    int colGoal = blocks[row][col] % dimension;
+                if (blocks[row][col] != 0) {
+                    int rowGoal = (blocks[row][col] - 1) / dimension;
+                    int colGoal = (blocks[row][col] - 1) % dimension;
                     manhattan += Math.abs(row - rowGoal) + Math.abs(col - colGoal);
                 }
     }
@@ -69,7 +68,7 @@ public class Board {
     }
 
     public boolean equals(Object y) {
-        if (y.getClass().getName().equals("Board")) {
+        if (y != null && y.getClass().getName().equals("Board")) {
             Board board = (Board) y;
             for (int row = 0; row < dimension; row++) {
                 for (int col = 0; col < dimension; col++) {
@@ -97,50 +96,72 @@ public class Board {
             }
         }
         if (zeroCol > 0) {
-            Board board1 = new Board(blocks);
-            int[][] blocks1 = board1.blocks;
+            int[][] blocks1 = deepClone(blocks);
             blocks1[zeroRow][zeroCol] = blocks1[zeroRow][zeroCol - 1];
             blocks1[zeroRow][zeroCol - 1] = 0;
-            boards[0] = board1;
+            boards[0] = new Board(blocks1);
         }
         if (zeroCol < dimension - 1) {
-            Board board2 = new Board(blocks);
-            int[][] blocks2 = board2.blocks;
+            int[][] blocks2 = deepClone(blocks);
             blocks2[zeroRow][zeroCol] = blocks2[zeroRow][zeroCol + 1];
             blocks2[zeroRow][zeroCol + 1] = 0;
-            boards[1] = board2;
+            boards[1] = new Board(blocks2);
         }
         if (zeroRow > 0) {
-            Board board3 = new Board(blocks);
-            int[][] blocks3 = board3.blocks;
+            int[][] blocks3 = deepClone(blocks);
             blocks3[zeroRow][zeroCol] = blocks3[zeroRow - 1][zeroCol];
             blocks3[zeroRow - 1][zeroCol] = 0;
-            boards[2] = board3;
+            boards[2] = new Board(blocks3);
         }
         if (zeroRow < dimension - 1) {
-            Board board4 = new Board(blocks);
-            int[][] blocks4 = board4.blocks;
+            int[][] blocks4 = deepClone(blocks);
             blocks4[zeroRow][zeroCol] = blocks4[zeroRow + 1][zeroCol];
             blocks4[zeroRow + 1][zeroCol] = 0;
-            boards[3] = board4;
+            boards[3] = new Board(blocks4);
         }
 
         return Arrays.asList(boards);
     }
 
-    public String toString() {
-        String output = dimension + "";
-        for (int row = 0; row < dimension; row++) {
-            output = output + "\n";
-            for (int col = 0; col < dimension; col++) {
-                output = output + blocks[row][col] + " ";
+    public int[][] deepClone(int[][] block) {
+        int length = block.length;
+        int[][] deepCloneBlock = new int[block.length][block.length];
+        for (int row = 0; row < length; row++) {
+            for (int col = 0; col < length; col++) {
+                deepCloneBlock[row][col] = block[row][col];
             }
         }
-        return output;
+        return deepCloneBlock;
+    }
+
+    public String toString() {
+        StringBuilder output = new StringBuilder();
+        output.append(dimension + "");
+        for (int row = 0; row < dimension; row++) {
+            output.append("\n ");
+            for (int col = 0; col < dimension; col++) {
+                output.append(blocks[row][col] + " ");
+            }
+        }
+        output.append("\n ");
+        return output.toString();
+    }
+
+    public void setPredecessor(Board board) {
+        this.predecessor = board;
+    }
+
+    public Board getPredecessor() {
+        return predecessor;
     }
 
     public static void main(String[] args) {
-
-
+        int[][] block = { { 1, 3, 2 }, { 4, 0, 7 }, { 9, 6, 2 } };
+        Board board = new Board(block);
+        Iterable<Board> boards = board.neighbors();
+        for (Board x : boards) {
+            System.out.println(x);
+            System.out.println();
+        }
     } // unit tests (not graded)
 }
