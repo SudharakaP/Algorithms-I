@@ -81,15 +81,7 @@ public class Solver {
             }
         }
     }
-
-    private Board[] resizeArray(Board[] board) {
-        Board[] newSolution = new Board[board.length * 2];
-        for (int i = 0; i < moves; i++) {
-            newSolution[i] = board[i];
-        }
-        return newSolution;
-    }
-
+    
     private class SearchNode {
         private final int priority;
         private final Board board;
