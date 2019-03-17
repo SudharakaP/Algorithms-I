@@ -13,91 +13,94 @@ import java.util.Arrays;
 public class Solver {
     private int moves;
     private boolean isSolvable;
-    private final Board[] solution;
-
-    private int movesTwin;
-    private final Board[] solutionTwin;
+    private SearchNode solution;
 
     public Solver(Board initial) {
         if (initial == null)
             throw new IllegalArgumentException();
-        moves = 0;
-        movesTwin = 0;
         MinPQ<SearchNode> boardQueue = new MinPQ<>(
                 (o1, o2) -> Integer.compare(o1.priority, o2.priority));
-        boardQueue.insert(new SearchNode(initial, moves));
+        boardQueue.insert(new SearchNode(initial, 0, null));
         MinPQ<SearchNode> boardQueueTwin = new MinPQ<>(
                 (o1, o2) -> Integer.compare(o1.priority, o2.priority));
-        boardQueueTwin.insert(new SearchNode(initial.twin(), moves));
-        Board predecessor = null;
-        Board predecessorTwin = null;
+        boardQueueTwin.insert(new SearchNode(initial.twin(), 0, null));
 
-        solution = new Board[1000];
-        solutionTwin = new Board[1000];
-        int index = 0;
-        do {
-            predecessor = computeAStar(boardQueue, predecessor);
-            predecessorTwin = computeAStarTwin(boardQueueTwin, predecessorTwin);
-        } while (!predecessor.isGoal() && !predecessorTwin.isGoal());
-
-        if (!predecessor.isGoal()) {
-            moves = -1;
+        while (!isSolvable && moves != -1) {
+            computeAStar(boardQueue);
+            computeAStarTwin(boardQueueTwin);
         }
     }
 
-    private Board computeAStar(MinPQ<SearchNode> boardQueue, Board predecessor) {
+    private void computeAStar(MinPQ<SearchNode> boardQueue) {
         SearchNode minPriorityBoardNode = boardQueue.delMin();
-        while (minPriorityBoardNode.moves != moves)
-            minPriorityBoardNode = boardQueue.delMin();
+        SearchNode predecessor = minPriorityBoardNode.prev;
+
         Board minPriorityBoard = minPriorityBoardNode.board;
-        solution[moves] = minPriorityBoard;
+        Board predecessorBoard = null;
+        if (predecessor != null)
+            predecessorBoard = predecessor.board;
 
         if (minPriorityBoard.isGoal()) {
             isSolvable = true;
-            return minPriorityBoard;
+            solution = minPriorityBoardNode;
+            moves = solution.movesSearch;
+            return;
         }
         Iterable<Board> neighbours = minPriorityBoard.neighbors();
-        moves++;
         for (Board neighbour : neighbours) {
             if (neighbour != null) {
-                if (predecessor == null || !predecessor.equals(neighbour))
-                    boardQueue.insert(new SearchNode(neighbour, moves));
+                if (predecessorBoard == null || !predecessorBoard.equals(neighbour))
+                    boardQueue
+                            .insert(new SearchNode(neighbour, minPriorityBoardNode.movesSearch + 1,
+                                                   minPriorityBoardNode));
             }
         }
-        return minPriorityBoard;
     }
 
 
-    private Board computeAStarTwin(MinPQ<SearchNode> boardQueue, Board predecessor) {
+    private void computeAStarTwin(MinPQ<SearchNode> boardQueue) {
         SearchNode minPriorityBoardNode = boardQueue.delMin();
-        while (minPriorityBoardNode.moves != movesTwin)
-            minPriorityBoardNode = boardQueue.delMin();
+        SearchNode predecessor = minPriorityBoardNode.prev;
+
         Board minPriorityBoard = minPriorityBoardNode.board;
-        solutionTwin[movesTwin] = minPriorityBoard;
+        Board predecessorBoard = null;
+        if (predecessor != null)
+            predecessorBoard = predecessor.board;
 
         if (minPriorityBoard.isGoal()) {
-            return minPriorityBoard;
+            moves = -1;
+            return;
         }
         Iterable<Board> neighbours = minPriorityBoard.neighbors();
-        movesTwin++;
         for (Board neighbour : neighbours) {
             if (neighbour != null) {
-                if (predecessor == null || !predecessor.equals(neighbour))
-                    boardQueue.insert(new SearchNode(neighbour, movesTwin));
+                if (predecessorBoard == null || !predecessorBoard.equals(neighbour))
+                    boardQueue
+                            .insert(new SearchNode(neighbour, minPriorityBoardNode.movesSearch + 1,
+                                                   minPriorityBoardNode));
             }
         }
-        return minPriorityBoard;
+    }
+
+    private Board[] resizeArray(Board[] board) {
+        Board[] newSolution = new Board[board.length * 2];
+        for (int i = 0; i < moves; i++) {
+            newSolution[i] = board[i];
+        }
+        return newSolution;
     }
 
     private class SearchNode {
-        private int priority;
-        private Board board;
-        private int moves;
+        private final int priority;
+        private final Board board;
+        private final SearchNode prev;
+        private final int movesSearch;
 
-        public SearchNode(Board board, int moves) {
+        public SearchNode(Board board, int movesSearch, SearchNode prev) {
             this.board = board;
-            this.moves = moves;
-            this.priority = moves + board.manhattan();
+            this.movesSearch = movesSearch;
+            this.priority = movesSearch + board.manhattan();
+            this.prev = prev;
         }
     }
 
@@ -112,10 +115,11 @@ public class Solver {
     public Iterable<Board> solution() {
         if (!isSolvable())
             return null;
-        Board[] nonNullArray = new Board[moves + 1];
-        for (int i = 0; i < moves + 1; i++) {
-            if (solution[i] != null)
-                nonNullArray[i] = solution[i];
+        SearchNode solutionNode = solution;
+        Board[] nonNullArray = new Board[solutionNode.movesSearch + 1];
+        for (int i = solutionNode.movesSearch; i >= 0; i--) {
+            nonNullArray[i] = solutionNode.board;
+            solutionNode = solutionNode.prev;
         }
         return Arrays.asList(nonNullArray);
     }
