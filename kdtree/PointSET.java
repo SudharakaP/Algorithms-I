@@ -74,5 +74,5 @@ public class PointSET {
 
     public static void main(String[] args) {
 
-    }                 // unit testing of the methods (optional)
+    }
 }
