@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 public class KdTree {
-    private TreeSet<Node> nodes;
+    private final TreeSet<Node> nodes;
     private Node root;
 
     public KdTree() {
@@ -49,7 +49,6 @@ public class KdTree {
     }
 
     public void draw() {
-        Node currentNode = root;
         for (Node node : nodes) {
             drawNode(node);
         }
@@ -169,7 +168,7 @@ public class KdTree {
     }
 
     private class Node implements Comparable<Node> {
-        private Point2D point;
+        private final Point2D point;
         private Node parent;
         private Node leftChild;
         private Node rightChild;
@@ -194,6 +193,6 @@ public class KdTree {
     }
 
     public static void main(String[] args) {
-
+        // No unit tests
     }
 }

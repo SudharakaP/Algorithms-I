@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 public class PointSET {
-    private TreeSet<Point2D> points;
+    private final TreeSet<Point2D> points;
 
     public PointSET() {
         points = new TreeSet<>();
@@ -69,6 +69,6 @@ public class PointSET {
     }
 
     public static void main(String[] args) {
-
+        // No unit tests
     }
 }
