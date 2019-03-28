@@ -68,30 +68,39 @@ public class KdTree {
             throw new IllegalArgumentException();
         if (isEmpty())
             return null;
-        return nearestPointInSubTree(root, p);
+        return nearestPointInSubTree(root, p, root).point;
     }
 
-    private Point2D nearestPointInSubTree(Node node, Point2D point) {
-        double distance = node.rectHV.distanceTo(point);
-        Point2D currentPoint = node.point;
-        if (node.leftChild.rectHV.distanceTo(point) < distance
-                && node.rightChild.rectHV.distanceTo(point) > distance)
-            currentPoint = nearestPointInSubTree(node.leftChild, point);
-        else if (node.leftChild.rectHV.distanceTo(point) > distance
-                && node.rightChild.rectHV.distanceTo(point) < distance)
-            currentPoint = nearestPointInSubTree(node.rightChild, point);
-        else if (node.leftChild.rectHV.distanceTo(point) < distance
-                && node.rightChild.rectHV.distanceTo(point) < distance) {
-            if (node.leftChild.rectHV.contains(point)) {
-                currentPoint = nearestPointInSubTree(node.leftChild, point);
-                currentPoint = nearestPointInSubTree(node.rightChild, point);
-            }
-            else {
-                currentPoint = nearestPointInSubTree(node.rightChild, point);
-                currentPoint = nearestPointInSubTree(node.leftChild, point);
-            }
+    private Node nearestPointInSubTree(Node node, Point2D point, Node championNode) {
+        double distance = node.point.distanceSquaredTo(point);
+        double minDistance = championNode.point.distanceSquaredTo(point);
+
+        if (distance < minDistance) {
+            championNode = node;
+            minDistance = distance;
         }
-        return currentPoint;
+
+        if (node.leftChild != null && node.rightChild != null
+                && node.leftChild.rectHV.distanceTo(point) < node.rightChild.rectHV
+                .distanceTo(point)) {
+            championNode = nearestPointInSubTree(node.leftChild, point, championNode);
+            if (node.rightChild.rectHV.distanceSquaredTo(point) < minDistance)
+                championNode = nearestPointInSubTree(node.rightChild, point, championNode);
+        }
+        else if (node.rightChild != null && node.leftChild != null
+                && node.rightChild.rectHV.distanceTo(point) < node.leftChild.rectHV
+                .distanceTo(point)) {
+            championNode = nearestPointInSubTree(node.rightChild, point, championNode);
+            if (node.leftChild.rectHV.distanceSquaredTo(point) < minDistance)
+                championNode = nearestPointInSubTree(node.leftChild, point, championNode);
+        }
+        else if (node.leftChild != null) {
+            championNode = nearestPointInSubTree(node.leftChild, point, championNode);
+        }
+        else if (node.rightChild != null) {
+            championNode = nearestPointInSubTree(node.rightChild, point, championNode);
+        }
+        return championNode;
     }
 
     private void nodesContainedInRect(Node node, RectHV rect, List<Point2D> points, int index) {
