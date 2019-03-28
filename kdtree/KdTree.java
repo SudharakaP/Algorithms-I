@@ -8,6 +8,7 @@ import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
 
+import java.util.Arrays;
 import java.util.TreeSet;
 
 public class KdTree {
@@ -95,7 +96,6 @@ public class KdTree {
         }
     }
 
-
     private void drawNode(Node node) {
         StdDraw.setPenColor(StdDraw.BLACK);
         StdDraw.setPenRadius(0.01);
@@ -112,36 +112,25 @@ public class KdTree {
     }
 
     public Iterable<Point2D> range(RectHV rect) {
-        // TODO
-        // if (rect == null)
-        //     throw new IllegalArgumentException();
-        // Point2D[] pointsWithin = new Point2D[size()];
-        // int i = 0;
-        // for (Point2D point : nodes) {
-        //     if (rect.contains(point)) {
-        //         pointsWithin[i++] = point;
-        //     }
-        // }
-        // Point2D[] pointsWithinNotNull = new Point2D[i + 1];
-        // for (int j = 0; j < i; j++) {
-        //     pointsWithinNotNull[j] = pointsWithin[j];
-        // }
-        // return Arrays.asList(pointsWithinNotNull);
-        return null;
+        if (rect == null)
+            throw new IllegalArgumentException();
+        Point2D[] points = new Point2D[size()];
+        subTreeContainedInRect(root, rect, points, 0);
+        return Arrays.asList(points);
+    }
+
+
+    private void subTreeContainedInRect(Node node, RectHV rect, Point2D[] points, int index) {
+        RectHV currentRect = node.rectHV;
+        if (currentRect.intersects(rect)) {
+            points[index++] = node.point;
+            subTreeContainedInRect(node.leftChild, rect, points, index);
+            subTreeContainedInRect(node.rightChild, rect, points, index);
+        }
     }
 
     public Point2D nearest(Point2D p) {
         // TODO
-        // if (p == null)
-        //     throw new IllegalArgumentException();
-        // if (isEmpty())
-        //     return null;
-        // Point2D nearest = null;
-        // for (Point2D point : nodes) {
-        //     if (nearest == null || point.distanceTo(p) < nearest.distanceTo(p))
-        //         nearest = point;
-        // }
-        // return nearest;
         return null;
     }
 
