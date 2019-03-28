@@ -40,6 +40,57 @@ public class KdTree {
         }
     }
 
+    public boolean contains(Point2D p) {
+        if (p == null)
+            throw new IllegalArgumentException();
+        return nodes.contains(new Node(p, null, null, null, 0)) || nodes
+                .contains(new Node(p, null, null, null, 1));
+    }
+
+    public void draw() {
+        Node currentNode = root;
+        for (Node node : nodes) {
+            drawNode(node);
+        }
+    }
+
+    public Iterable<Point2D> range(RectHV rect) {
+        if (rect == null)
+            throw new IllegalArgumentException();
+        Point2D[] points = new Point2D[size()];
+        subTreeContainedInRect(root, rect, points, 0);
+        return Arrays.asList(points);
+    }
+
+    public Point2D nearest(Point2D p) {
+        // TODO
+        return null;
+    }
+
+    private void subTreeContainedInRect(Node node, RectHV rect, Point2D[] points, int index) {
+        RectHV currentRect = node.rectHV;
+        if (currentRect.intersects(rect)) {
+            points[index++] = node.point;
+            subTreeContainedInRect(node.leftChild, rect, points, index);
+            subTreeContainedInRect(node.rightChild, rect, points, index);
+        }
+    }
+
+    private void drawNode(Node node) {
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.setPenRadius(0.01);
+        node.point.draw();
+        StdDraw.setPenRadius();
+        if (node.depth % 2 == 0) {
+            StdDraw.setPenColor(StdDraw.RED);
+            StdDraw.line(node.point.x(), node.rectHV.ymin(), node.point.x(), node.rectHV.ymax());
+        }
+        else {
+            StdDraw.setPenColor(StdDraw.BLUE);
+            StdDraw.line(node.rectHV.xmin(), node.point.y(), node.rectHV.xmax(), node.point.y());
+        }
+    }
+
     private void insertNode(Node node, Node parent) {
         if (node.compareTo(parent) > 0 && parent.rightChild == null) {
             node.parent = parent;
@@ -80,58 +131,6 @@ public class KdTree {
         else {
             return;
         }
-    }
-
-    public boolean contains(Point2D p) {
-        if (p == null)
-            throw new IllegalArgumentException();
-        return nodes.contains(new Node(p, null, null, null, 0)) || nodes
-                .contains(new Node(p, null, null, null, 1));
-    }
-
-    public void draw() {
-        Node currentNode = root;
-        for (Node node : nodes) {
-            drawNode(node);
-        }
-    }
-
-    private void drawNode(Node node) {
-        StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.setPenRadius(0.01);
-        node.point.draw();
-        StdDraw.setPenRadius();
-        if (node.depth % 2 == 0) {
-            StdDraw.setPenColor(StdDraw.RED);
-            StdDraw.line(node.point.x(), node.rectHV.ymin(), node.point.x(), node.rectHV.ymax());
-        }
-        else {
-            StdDraw.setPenColor(StdDraw.BLUE);
-            StdDraw.line(node.rectHV.xmin(), node.point.y(), node.rectHV.xmax(), node.point.y());
-        }
-    }
-
-    public Iterable<Point2D> range(RectHV rect) {
-        if (rect == null)
-            throw new IllegalArgumentException();
-        Point2D[] points = new Point2D[size()];
-        subTreeContainedInRect(root, rect, points, 0);
-        return Arrays.asList(points);
-    }
-
-
-    private void subTreeContainedInRect(Node node, RectHV rect, Point2D[] points, int index) {
-        RectHV currentRect = node.rectHV;
-        if (currentRect.intersects(rect)) {
-            points[index++] = node.point;
-            subTreeContainedInRect(node.leftChild, rect, points, index);
-            subTreeContainedInRect(node.rightChild, rect, points, index);
-        }
-    }
-
-    public Point2D nearest(Point2D p) {
-        // TODO
-        return null;
     }
 
     private class Node implements Comparable<Node> {
