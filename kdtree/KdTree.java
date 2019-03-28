@@ -8,7 +8,8 @@ import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
 public class KdTree {
@@ -57,22 +58,50 @@ public class KdTree {
     public Iterable<Point2D> range(RectHV rect) {
         if (rect == null)
             throw new IllegalArgumentException();
-        Point2D[] points = new Point2D[size()];
-        subTreeContainedInRect(root, rect, points, 0);
-        return Arrays.asList(points);
+        List<Point2D> points = new ArrayList<>();
+        nodesContainedInRect(root, rect, points, 0);
+        return points;
     }
 
     public Point2D nearest(Point2D p) {
-        // TODO
-        return null;
+        if (p == null)
+            throw new IllegalArgumentException();
+        if (isEmpty())
+            return null;
+        return nearestPointInSubTree(root, p);
     }
 
-    private void subTreeContainedInRect(Node node, RectHV rect, Point2D[] points, int index) {
+    private Point2D nearestPointInSubTree(Node node, Point2D point) {
+        double distance = node.rectHV.distanceTo(point);
+        Point2D currentPoint = node.point;
+        if (node.leftChild.rectHV.distanceTo(point) < distance
+                && node.rightChild.rectHV.distanceTo(point) > distance)
+            currentPoint = nearestPointInSubTree(node.leftChild, point);
+        else if (node.leftChild.rectHV.distanceTo(point) > distance
+                && node.rightChild.rectHV.distanceTo(point) < distance)
+            currentPoint = nearestPointInSubTree(node.rightChild, point);
+        else if (node.leftChild.rectHV.distanceTo(point) < distance
+                && node.rightChild.rectHV.distanceTo(point) < distance) {
+            if (node.leftChild.rectHV.contains(point)) {
+                currentPoint = nearestPointInSubTree(node.leftChild, point);
+                currentPoint = nearestPointInSubTree(node.rightChild, point);
+            }
+            else {
+                currentPoint = nearestPointInSubTree(node.rightChild, point);
+                currentPoint = nearestPointInSubTree(node.leftChild, point);
+            }
+        }
+        return currentPoint;
+    }
+
+    private void nodesContainedInRect(Node node, RectHV rect, List<Point2D> points, int index) {
+        if (node == null)
+            return;
         RectHV currentRect = node.rectHV;
         if (currentRect.intersects(rect)) {
-            points[index++] = node.point;
-            subTreeContainedInRect(node.leftChild, rect, points, index);
-            subTreeContainedInRect(node.rightChild, rect, points, index);
+            points.add(node.point);
+            nodesContainedInRect(node.leftChild, rect, points, index);
+            nodesContainedInRect(node.rightChild, rect, points, index);
         }
     }
 

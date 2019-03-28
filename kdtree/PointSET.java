@@ -7,7 +7,8 @@
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
 public class PointSET {
@@ -45,18 +46,13 @@ public class PointSET {
     public Iterable<Point2D> range(RectHV rect) {
         if (rect == null)
             throw new IllegalArgumentException();
-        Point2D[] pointsWithin = new Point2D[size()];
-        int i = 0;
+        List<Point2D> pointsWithin = new ArrayList<>();
         for (Point2D point : points) {
             if (rect.contains(point)) {
-                pointsWithin[i++] = point;
+                pointsWithin.add(point);
             }
         }
-        Point2D[] pointsWithinNotNull = new Point2D[i + 1];
-        for (int j = 0; j < i; j++) {
-            pointsWithinNotNull[j] = pointsWithin[j];
-        }
-        return Arrays.asList(pointsWithinNotNull);
+        return pointsWithin;
     }
 
     public Point2D nearest(Point2D p) {
