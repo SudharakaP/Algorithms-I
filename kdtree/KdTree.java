@@ -80,15 +80,15 @@ public class KdTree {
         }
 
         if (node.leftChild != null && node.rightChild != null
-                && node.leftChild.rectHV.distanceTo(point) < node.rightChild.rectHV
-                .distanceTo(point)) {
+                && node.leftChild.rectHV.distanceSquaredTo(point) < node.rightChild.rectHV
+                .distanceSquaredTo(point)) {
             championNode = nearestPointInSubTree(node.leftChild, point, championNode);
             if (node.rightChild.rectHV.distanceSquaredTo(point) < minDistance)
                 championNode = nearestPointInSubTree(node.rightChild, point, championNode);
         }
         else if (node.rightChild != null && node.leftChild != null
-                && node.rightChild.rectHV.distanceTo(point) < node.leftChild.rectHV
-                .distanceTo(point)) {
+                && node.rightChild.rectHV.distanceSquaredTo(point) < node.leftChild.rectHV
+                .distanceSquaredTo(point)) {
             championNode = nearestPointInSubTree(node.rightChild, point, championNode);
             if (node.leftChild.rectHV.distanceSquaredTo(point) < minDistance)
                 championNode = nearestPointInSubTree(node.leftChild, point, championNode);
