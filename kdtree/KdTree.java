@@ -10,22 +10,17 @@ import edu.princeton.cs.algs4.StdDraw;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
 public class KdTree {
-    private final TreeSet<Node> nodes;
     private Node root;
-
-    public KdTree() {
-        nodes = new TreeSet<>();
-    }
+    private int size;
 
     public boolean isEmpty() {
-        return nodes.isEmpty();
+        return size == 0;
     }
 
     public int size() {
-        return nodes.size();
+        return size;
     }
 
     public void insert(Point2D p) {
@@ -34,7 +29,7 @@ public class KdTree {
         if (isEmpty()) {
             root = new Node(p, null, null, null, 0);
             root.rectHV = new RectHV(0, 0, 1, 1);
-            nodes.add(root);
+            size++;
         }
         else {
             insertNode(new Node(p, null, null, null, 0), root);
@@ -44,14 +39,12 @@ public class KdTree {
     public boolean contains(Point2D p) {
         if (p == null)
             throw new IllegalArgumentException();
-        return nodes.contains(new Node(p, null, null, null, 0)) || nodes
-                .contains(new Node(p, null, null, null, 1));
+        return nodeExists(new Node(p, null, null, null, 0)) || nodeExists(
+                new Node(p, null, null, null, 1));
     }
 
     public void draw() {
-        for (Node node : nodes) {
-            drawNode(node);
-        }
+        drawSubtree(root);
     }
 
     public Iterable<Point2D> range(RectHV rect) {
@@ -68,6 +61,22 @@ public class KdTree {
         if (isEmpty())
             return null;
         return nearestPointInSubTree(root, p, root).point;
+    }
+
+    private void drawSubtree(Node node) {
+        if (node == null)
+            return;
+        drawNode(node);
+        drawSubtree(node.leftChild);
+        drawSubtree(node.rightChild);
+    }
+
+    private boolean nodeExists(Node node) {
+        if (node == null)
+            return false;
+        if (root.compareTo(node) == 0)
+            return true;
+        return nodeExists(node.leftChild) || nodeExists(node.rightChild);
     }
 
     private Node nearestPointInSubTree(Node node, Point2D point, Node championNode) {
@@ -140,7 +149,7 @@ public class KdTree {
             else
                 node.rectHV = new RectHV(parent.rectHV.xmin(), parent.point.y(),
                                          parent.rectHV.xmax(), parent.rectHV.ymax());
-            nodes.add(node);
+            size++;
             return;
         }
 
@@ -155,7 +164,7 @@ public class KdTree {
             else
                 node.rectHV = new RectHV(parent.rectHV.xmin(), parent.rectHV.ymin(),
                                          parent.rectHV.xmax(), parent.point.y());
-            nodes.add(node);
+            size++;
             return;
         }
 
