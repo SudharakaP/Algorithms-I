@@ -166,9 +166,6 @@ public class KdTree {
         else if (node.compareTo(parent) < 0) {
             insertNode(node, parent.leftChild);
         }
-        else {
-            return;
-        }
     }
 
     private class Node implements Comparable<Node> {
