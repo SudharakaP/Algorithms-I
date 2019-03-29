@@ -98,7 +98,7 @@ public class KdTree {
         }
 
         if (node.leftChild != null && node.rightChild != null
-                && node.leftChild.rectHV.distanceSquaredTo(point) < node.rightChild.rectHV
+                && node.leftChild.rectHV.distanceSquaredTo(point) <= node.rightChild.rectHV
                 .distanceSquaredTo(point)) {
             championNode = nearestPointInSubTree(node.leftChild, point, championNode);
             if (node.rightChild.rectHV.distanceSquaredTo(point) < minDistance)
@@ -227,6 +227,6 @@ public class KdTree {
             kdtree.insert(p);
         }
 
-        System.out.println(kdtree.range(new RectHV(0.505, 0.293, 0.749, 0.869)));
+        System.out.println(kdtree.nearest(new Point2D(0.372, 0.411)));
     }
 }
