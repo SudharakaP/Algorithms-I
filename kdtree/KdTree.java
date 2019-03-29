@@ -97,26 +97,25 @@ public class KdTree {
             minDistance = distance;
         }
 
-        if (node.leftChild != null && node.rightChild != null
-                && node.leftChild.rectHV.distanceSquaredTo(point) <= node.rightChild.rectHV
-                .distanceSquaredTo(point)) {
-            championNode = nearestPointInSubTree(node.leftChild, point, championNode);
-            if (node.rightChild.rectHV.distanceSquaredTo(point) < minDistance)
-                championNode = nearestPointInSubTree(node.rightChild, point, championNode);
-        }
-        else if (node.rightChild != null && node.leftChild != null
-                && node.rightChild.rectHV.distanceSquaredTo(point) < node.leftChild.rectHV
-                .distanceSquaredTo(point)) {
-            championNode = nearestPointInSubTree(node.rightChild, point, championNode);
-            if (node.leftChild.rectHV.distanceSquaredTo(point) < minDistance)
+        if (minDistance < node.rectHV.distanceSquaredTo(point))
+            return championNode;
+
+        if (node.leftChild != null && node.rightChild != null) {
+            if (node.leftChild.rectHV.distanceSquaredTo(point) < node.rightChild.rectHV
+                    .distanceSquaredTo(point)) {
                 championNode = nearestPointInSubTree(node.leftChild, point, championNode);
+                return nearestPointInSubTree(node.rightChild, point, championNode);
+            }
+            else {
+                championNode = nearestPointInSubTree(node.rightChild, point, championNode);
+                return nearestPointInSubTree(node.leftChild, point, championNode);
+            }
         }
-        else if (node.leftChild != null) {
-            championNode = nearestPointInSubTree(node.leftChild, point, championNode);
-        }
-        else if (node.rightChild != null) {
-            championNode = nearestPointInSubTree(node.rightChild, point, championNode);
-        }
+
+        if (node.leftChild != null)
+            return nearestPointInSubTree(node.leftChild, point, championNode);
+        else if (node.rightChild != null)
+            return nearestPointInSubTree(node.rightChild, point, championNode);
         return championNode;
     }
 
@@ -227,6 +226,6 @@ public class KdTree {
             kdtree.insert(p);
         }
 
-        System.out.println(kdtree.nearest(new Point2D(0.372, 0.411)));
+        System.out.println(kdtree.nearest(new Point2D(0.0, 0.565)));
     }
 }
