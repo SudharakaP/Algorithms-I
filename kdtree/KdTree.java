@@ -193,11 +193,10 @@ public class KdTree {
                 node.rectHV = new RectHV(parentXmin, parentYmin,
                                          parentXmax, parent.point.y());
             size++;
-            return;
         }
     }
 
-    private class Node implements Comparable<Node> {
+    private final class Node implements Comparable<Node> {
         private final Point2D point;
         private Node parent;
         private Node leftChild;
@@ -205,7 +204,7 @@ public class KdTree {
         private RectHV rectHV;
         private int depth;
 
-        public Node(Point2D point, Node parent, Node leftChild, Node rightChild, int depth) {
+        private Node(Point2D point, Node parent, Node leftChild, Node rightChild, int depth) {
             this.point = point;
             this.parent = parent;
             this.leftChild = leftChild;
