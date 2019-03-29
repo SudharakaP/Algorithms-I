@@ -89,7 +89,6 @@ public class KdTree {
     }
 
     private Node nearestPointInSubTree(Node node, Point2D point, Node championNode) {
-        System.out.println(node.point);
         double distance = node.point.distanceSquaredTo(point);
         double minDistance = championNode.point.distanceSquaredTo(point);
         if (minDistance < node.rectHV.distanceSquaredTo(point))
@@ -151,19 +150,20 @@ public class KdTree {
     }
 
     private void insertNode(Node node, Node parent) {
-        double xCor = node.point.x();
-        double yCor = node.point.y();
-        double parentXCor = parent.point.x();
-        double parentYCor = parent.point.y();
+        if (node.point.equals(parent.point))
+            return;
+
+        if (node.compareTo(parent) >= 0 && parent.rightChild != null) {
+            insertNode(node, parent.rightChild);
+        }
+        else if (node.compareTo(parent) < 0 && parent.leftChild != null) {
+            insertNode(node, parent.leftChild);
+        }
 
         double parentXmin = parent.rectHV.xmin();
         double parentXmax = parent.rectHV.xmax();
         double parentYmin = parent.rectHV.ymin();
         double parentYmax = parent.rectHV.ymax();
-
-        if (Double.compare(xCor, parentXCor) == 0
-                && Double.compare(yCor, parentYCor) == 0)
-            return;
 
         if (node.compareTo(parent) >= 0 && parent.rightChild == null) {
             node.parent = parent;
@@ -171,11 +171,12 @@ public class KdTree {
             node.parent.rightChild = node;
 
             if (parent.depth % 2 == 0)
-                node.rectHV = new RectHV(parentXCor, parentYmin,
+                node.rectHV = new RectHV(parent.point.x(), parentYmin,
                                          parentXmax, parentYmax);
             else
-                node.rectHV = new RectHV(parentXmin, parentYCor,
+                node.rectHV = new RectHV(parentXmin, parent.point.y(),
                                          parentXmax, parentYmax);
+
             size++;
             return;
         }
@@ -187,19 +188,12 @@ public class KdTree {
 
             if (parent.depth % 2 == 0)
                 node.rectHV = new RectHV(parentXmin, parentYmin,
-                                         parentXCor, parentYmax);
+                                         parent.point.x(), parentYmax);
             else
                 node.rectHV = new RectHV(parentXmin, parentYmin,
-                                         parentXmax, parentYCor);
+                                         parentXmax, parent.point.y());
             size++;
             return;
-        }
-
-        if (node.compareTo(parent) >= 0) {
-            insertNode(node, parent.rightChild);
-        }
-        else if (node.compareTo(parent) < 0) {
-            insertNode(node, parent.leftChild);
         }
     }
 
