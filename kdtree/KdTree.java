@@ -4,6 +4,7 @@
  *  Description:Implementation of a 2-d tree.
  **************************************************************************** */
 
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
@@ -39,8 +40,9 @@ public class KdTree {
     public boolean contains(Point2D p) {
         if (p == null)
             throw new IllegalArgumentException();
-        return nodeExists(new Node(p, null, null, null, 0)) || nodeExists(
-                new Node(p, null, null, null, 1));
+        if (isEmpty())
+            return false;
+        return nodeExists(root, p);
     }
 
     public void draw() {
@@ -51,7 +53,7 @@ public class KdTree {
         if (rect == null)
             throw new IllegalArgumentException();
         List<Point2D> points = new ArrayList<>();
-        nodesContainedInRect(root, rect, points, 0);
+        nodesContainedInRect(root, rect, points);
         return points;
     }
 
@@ -71,12 +73,19 @@ public class KdTree {
         drawSubtree(node.rightChild);
     }
 
-    private boolean nodeExists(Node node) {
-        if (node == null)
-            return false;
-        if (root.compareTo(node) == 0)
+    private boolean nodeExists(Node node, Point2D point) {
+        if (Double.compare(node.point.x(), point.x()) == 0
+                && Double.compare(node.point.y(), point.y()) == 0)
             return true;
-        return nodeExists(node.leftChild) || nodeExists(node.rightChild);
+        Node currentNode = new Node(point, null, null, null, 0);
+        if (currentNode.compareTo(node) >= 0) {
+            node = node.rightChild;
+            return node != null && nodeExists(node, point);
+        }
+        else {
+            node = node.leftChild;
+            return node != null && nodeExists(node, point);
+        }
     }
 
     private Node nearestPointInSubTree(Node node, Point2D point, Node championNode) {
@@ -111,14 +120,14 @@ public class KdTree {
         return championNode;
     }
 
-    private void nodesContainedInRect(Node node, RectHV rect, List<Point2D> points, int index) {
+    private void nodesContainedInRect(Node node, RectHV rect, List<Point2D> points) {
         if (node == null)
             return;
         RectHV currentRect = node.rectHV;
         if (currentRect.intersects(rect)) {
             points.add(node.point);
-            nodesContainedInRect(node.leftChild, rect, points, index);
-            nodesContainedInRect(node.rightChild, rect, points, index);
+            nodesContainedInRect(node.leftChild, rect, points);
+            nodesContainedInRect(node.rightChild, rect, points);
         }
     }
 
@@ -138,7 +147,11 @@ public class KdTree {
     }
 
     private void insertNode(Node node, Node parent) {
-        if (node.compareTo(parent) > 0 && parent.rightChild == null) {
+        if (Double.compare(node.point.x(), parent.point.x()) == 0
+                && Double.compare(node.point.y(), parent.point.y()) == 0)
+            return;
+
+        if (node.compareTo(parent) >= 0 && parent.rightChild == null) {
             node.parent = parent;
             node.depth = parent.depth + 1;
             node.parent.rightChild = node;
@@ -168,7 +181,7 @@ public class KdTree {
             return;
         }
 
-        if (node.compareTo(parent) > 0) {
+        if (node.compareTo(parent) >= 0) {
             insertNode(node, parent.rightChild);
         }
         else if (node.compareTo(parent) < 0) {
@@ -202,6 +215,17 @@ public class KdTree {
     }
 
     public static void main(String[] args) {
-        // No unit tests
+        // initialize the data structures from file
+        String filename = args[0];
+        In in = new In(filename);
+        KdTree kdtree = new KdTree();
+        while (!in.isEmpty()) {
+            double x = in.readDouble();
+            double y = in.readDouble();
+            Point2D p = new Point2D(x, y);
+            kdtree.insert(p);
+        }
+
+        System.out.println(kdtree.range(new RectHV(0.505, 0.293, 0.749, 0.869)));
     }
 }
