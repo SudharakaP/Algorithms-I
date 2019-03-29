@@ -125,7 +125,8 @@ public class KdTree {
             return;
         RectHV currentRect = node.rectHV;
         if (currentRect.intersects(rect)) {
-            points.add(node.point);
+            if (rect.contains(node.point))
+                points.add(node.point);
             nodesContainedInRect(node.leftChild, rect, points);
             nodesContainedInRect(node.rightChild, rect, points);
         }
