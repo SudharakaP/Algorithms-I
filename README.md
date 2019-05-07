@@ -1,6 +1,6 @@
 # Algorithms-I
 
-This is some of the algorithms that were implemented as part of the Algorithms-I course (https://www.coursera.org/learn/algorithms-part1/).
+These are some of the algorithms that were implemented as part of the Algorithms-I course (https://www.coursera.org/learn/algorithms-part1/).
 
 - Percolation: http://coursera.cs.princeton.edu/algs4/assignments/percolation.html
 
